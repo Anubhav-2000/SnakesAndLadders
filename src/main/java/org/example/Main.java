@@ -1,39 +1,44 @@
 package org.example;
 
-import org.example.model.Ladder;
-import org.example.model.Player;
-import org.example.model.Snake;
-import org.example.service.GameService;
+import org.example.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.sql.Array;
+import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        List<Snake> snakes= new ArrayList<>();
-        List<Ladder> ladders= new ArrayList<>();
-        List<Player> players= new ArrayList<>();
-        Scanner scanner= new Scanner(System.in);
-        int s= scanner.nextInt();
-        for(int i=0;i<s;i++){
-            snakes.add(new Snake(scanner.nextInt(), scanner.nextInt()));
+        Scanner scanner = new Scanner(System.in);
+        int snakeCount = scanner.nextInt();
+        Map<Integer,Integer> snakes= new HashMap<>();
+        Map<Integer,Integer> ladders= new HashMap<>();
+        for(int i=0;i<snakeCount;i++){
+            int head =scanner.nextInt();
+            int tail = scanner.nextInt();
+            snakes.put(head,tail);
         }
-        int l= scanner.nextInt();
-        for(int i=0;i<l;i++){
-            ladders.add(new Ladder(scanner.nextInt(), scanner.nextInt()));
+        int ladderCount = scanner.nextInt();
+        for(int i=0;i<ladderCount;i++){
+            int head =scanner.nextInt();
+            int tail = scanner.nextInt();
+            ladders.put(head,tail);
         }
-        int p= scanner.nextInt();
-        for(int i=0;i<p;i++){
-            String name= scanner.next();
-            players.add(new Player(name));
+        int numPlayers = scanner.nextInt();
+        scanner.nextLine();
+        List<Player> players = new ArrayList<>(numPlayers);
+        for(int i=0;i<numPlayers;i++){
+            String name = scanner.nextLine();
+            Player player = new Player(name);
+            players.add(player);
         }
         System.out.println();
-        GameService gameService= new GameService(snakes,ladders,players);
-        String player= gameService.simulateGame();
-        System.out.println(player +" wins the game");
-
+        Dice singleDice = new SingleDice();
+        Dice doubleDice = new DoubleDice();
+        Board board = new Board(200,doubleDice,0,ladders,snakes,players);
+        while(!board.hasGameEnded()){
+            board.simulateTurn();
+        }
+        System.out.println(board.getWinners());
 
     }
 }
